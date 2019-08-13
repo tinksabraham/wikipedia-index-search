@@ -1,28 +1,33 @@
-/*
 package com.wiki.search.services;
 
 import com.wiki.search.models.WikiArticleModel;
 import com.wiki.search.exception.IndexIOException;
 import com.wiki.search.exception.IndexSearchParseException;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 
 import static org.junit.Assert.*;
 
-*/
 /**
  * @author Tinku Abraham
- *//*
+ */
 
-
-@RunWith(MockitoJUnitRunner.class)
+// @RunWith(MockitoJUnitRunner.class)
+@RunWith(SpringRunner.class)
+@ContextConfiguration(classes = LuceneSearchService.class)
+@TestPropertySource(properties = "indexed.directory.path=indexedDir")
 public class LuceneSearchServiceTest {
 
-    @InjectMocks
+    @Autowired
     private LuceneSearchService luceneSearchServiceUnderTest;
 
     @Test(expected = IndexIOException.class)
@@ -35,7 +40,7 @@ public class LuceneSearchServiceTest {
         final String searchTerm = "Gatsby";
 
         // When & Then
-        luceneSearchServiceUnderTest.search(searchTerm);
+        luceneSearchServiceUnderTest.search(searchTerm, "10");
     }
 
     @Test(expected = IndexSearchParseException.class)
@@ -45,7 +50,7 @@ public class LuceneSearchServiceTest {
         final String searchTerm = "*Denniss";
 
         // When & Then
-        luceneSearchServiceUnderTest.search(searchTerm);
+        luceneSearchServiceUnderTest.search(searchTerm, "10");
     }
 
     @Test
@@ -56,7 +61,7 @@ public class LuceneSearchServiceTest {
         final String searchTermArticle = "Advanced Micro Devices";
 
         // When
-        List<WikiArticleModel> wikiArticleModelList = luceneSearchServiceUnderTest.search(searchTerm);
+        List<WikiArticleModel> wikiArticleModelList = luceneSearchServiceUnderTest.search(searchTerm, "10");
 
         // Then
         assertEquals(wikiArticleModelList.get(0).getContributor(), searchTerm);
@@ -75,7 +80,7 @@ public class LuceneSearchServiceTest {
         final String searchTerm = "Denniss*";
 
         // When
-        List<WikiArticleModel> wikiArticleModelList = luceneSearchServiceUnderTest.search(searchTerm);
+        List<WikiArticleModel> wikiArticleModelList = luceneSearchServiceUnderTest.search(searchTerm, "10");
 
         // Then
         assertEquals(wikiArticleModelList.get(0).getContributor(), searchTerm.replace("*", ""));
@@ -90,7 +95,7 @@ public class LuceneSearchServiceTest {
         final String searchTerm = "Apollo";
 
         // When
-        List<WikiArticleModel> wikiArticleModelList = luceneSearchServiceUnderTest.search(searchTerm);
+        List<WikiArticleModel> wikiArticleModelList = luceneSearchServiceUnderTest.search(searchTerm, "10");
         boolean articleApollo13Exits = wikiArticleModelList.stream()
                 .anyMatch(t -> t.getArticle().equals("Apollo 13"));
 
@@ -102,4 +107,4 @@ public class LuceneSearchServiceTest {
         assertTrue(articleApollo9Exits);
     }
 
-}*/
+}
