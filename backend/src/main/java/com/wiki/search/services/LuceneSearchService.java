@@ -17,6 +17,7 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -30,12 +31,23 @@ import java.util.List;
 @Service
 public class LuceneSearchService {
 
+    @Value("${indexed.directory.path}")
+    private String directory;
+
     private final Logger log = LogManager.getLogger(this.getClass());
 
     private static final String INDEX_FIELD_ID = "id";
     private static final String INDEX_FIELD_TITLE = "title";
     private static final String INDEX_FIELD_CONTRIBUTOR = "contributor";
 
+    /**
+     *
+     * Response generator for indexed search documents
+     *
+     * @param searchTerm
+     * @param searchSize
+     * @return response of view models of found articles
+     */
     public List<WikiArticleModel> search(String searchTerm, String searchSize) {
 
         List<WikiArticleModel> wikiArticleModelList = new ArrayList<>();
@@ -63,7 +75,9 @@ public class LuceneSearchService {
     private IndexSearcher createSearcher() throws IndexIOException{
         IndexSearcher indexSearcher = null;
         IndexReader reader;
-        try (Directory dir = FSDirectory.open(Paths.get("indexedDir"))) {
+
+        // if paths not found, it will create a directory
+        try (Directory dir = FSDirectory.open(Paths.get(directory))) {
             reader = DirectoryReader.open(dir);
             indexSearcher = new IndexSearcher(reader);
         } catch (IOException ex) {
@@ -87,6 +101,7 @@ public class LuceneSearchService {
         Query firstNameQuery = null;
         TopDocs topDocs = null;
 
+        // indexed fields to be searched
         String[] indexFieldList = {"contributor", "text"};
         MultiFieldQueryParser mulFieldQueryParser = new MultiFieldQueryParser(indexFieldList, new StandardAnalyzer());
 
