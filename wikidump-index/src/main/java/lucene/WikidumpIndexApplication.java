@@ -3,16 +3,9 @@ package lucene;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.*;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
-import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
@@ -33,7 +26,7 @@ import parser.WikiXMLParserFactory;
 import org.apache.commons.cli.*;
 
 /**
- * Main application to index wikipedia using lucene
+ * Main application to index wikipedia dump using lucene
  *
  * @author Tinku Abraham
  */
@@ -53,28 +46,25 @@ public class WikidumpIndexApplication {
     private static final String INDEX_FIELD_CONTRIBUTOR = "contributor";
     private static final String INDEX_FIELD_TEXT = "text";
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 
-//        CommandLineParser parser = new DefaultParser();
-//        Options options = prepareOptions();
-//        try {
-//            CommandLine cmd = parser.parse(options, args, true);
-//            if(cmd.hasOption(WIKI_PATH)) {
-//                wikiDumpFilePath = cmd.getOptionValue(WIKI_PATH);
-//            }
-//            if(cmd.hasOption(MAX_INDEX)) {
-//                maxIndexCount = Integer.parseInt(cmd.getOptionValue(MAX_INDEX));
-//            }
-//        } catch (ParseException ex) {
-//            logger.warn(ex.getMessage());
-//            new HelpFormatter().printHelp(HELP, options);
-//        }
-//
-//        WikipediaLucene main = new WikipediaLucene();
-//        main.index();
+        CommandLineParser parser = new DefaultParser();
+        Options options = prepareOptions();
+        try {
+            CommandLine cmd = parser.parse(options, args, true);
+            if(cmd.hasOption(WIKI_PATH)) {
+                wikiDumpFilePath = cmd.getOptionValue(WIKI_PATH);
+            }
+            if(cmd.hasOption(MAX_INDEX)) {
+                maxIndexCount = Integer.parseInt(cmd.getOptionValue(MAX_INDEX));
+            }
+        } catch (ParseException ex) {
+            logger.warn(ex.getMessage());
+            new HelpFormatter().printHelp(HELP, options);
+        }
 
-
-        search();
+        WikidumpIndexApplication main = new WikidumpIndexApplication();
+        main.index();
     }
 
     private static Options prepareOptions() {
@@ -87,7 +77,7 @@ public class WikidumpIndexApplication {
                 .build();
         Option maxOption = Option.builder().required()
                 .longOpt(MAX_INDEX)
-                .desc("maximum count of indexed file" )
+                .desc("maximum number of indexed file" )
                 .hasArg()
                 .build();
 
@@ -97,42 +87,7 @@ public class WikidumpIndexApplication {
         return options;
     }
 
-    private static void search() throws IOException {
-        IndexSearcher searcher = createSearcher();
-
-        //Search by firstName
-        TopDocs foundDocs = null;
-        try {
-            foundDocs = searchByContent("Jim Lovell Apollo 13", searcher);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        logger.debug("Total Results :: " + foundDocs.totalHits);
-
-        for (ScoreDoc sd : foundDocs.scoreDocs) {
-            Document d = searcher.doc(sd.doc);
-            logger.debug(d.get("title") + " - " + d.get("id") + " - " + d.get("contributor"));
-        }
-    }
-
-    private static TopDocs searchByContent(String textContent, IndexSearcher searcher) throws Exception {
-        String[] indexFieldList = {"contributor", "text"};
-        MultiFieldQueryParser mulFieldQueryParser = new MultiFieldQueryParser(indexFieldList, new StandardAnalyzer());
-        Query firstNameQuery = mulFieldQueryParser.parse(textContent);
-        return searcher.search(firstNameQuery, 10);
-    }
-
-    private static IndexSearcher createSearcher() throws IOException {
-        Directory dir = FSDirectory.open(Paths.get("indexedDir"));
-        IndexReader reader = DirectoryReader.open(dir);
-        return new IndexSearcher(reader);
-    }
-
     private void index() {
-
-        // true creates a new index / false updates the existing index
-        boolean create = false;
 
         // check if data directory exists
         logger.debug("wikipedia dump file = " + wikiDumpFilePath);
@@ -150,16 +105,7 @@ public class WikidumpIndexApplication {
             Directory dir = FSDirectory.open(Paths.get("indexedDir"));
             Analyzer analyzer = new StandardAnalyzer();
             IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
-
-            if (create) {
-                // Create new index, remove previous index
-                //logger.debug("Creating a new index in directory: '" + this.indexFolder + "'...");
-                iwc.setOpenMode(OpenMode.CREATE);
-            } else {
-                // Add new documents to existing index
-                //logger.debug("Updating the index in directory: '" + this.indexFolder + "'...");
-                iwc.setOpenMode(OpenMode.CREATE_OR_APPEND);
-            }
+            iwc.setOpenMode(OpenMode.CREATE);
 
             // index
             IndexWriter writer = new IndexWriter(dir, iwc);
@@ -206,17 +152,14 @@ public class WikidumpIndexApplication {
                 try {
                     fis = new FileInputStream(file);
                 } catch (FileNotFoundException fnfe) {
-                    // at least on windows, some temporary files raise this com.wiki.dump.searchindex.exception with an "access denied" message
+                    // at least on windows, some temporary files raise an "access denied" message
                     // checking if the file can be read doesn't help
                     return;
                 }
 
                 try {
 
-                    // create a new, empty document
                     final Document doc = new Document();
-
-                    // access wikipedia dump file
                     WikiXMLParser wxsp = WikiXMLParserFactory.getSAXParser(file.getAbsolutePath());
 
                     try {
@@ -234,9 +177,6 @@ public class WikidumpIndexApplication {
                                     logger.error("Facet Id unknown for wikipedia article '" + page.getTitle() + "'. Nothing done.");
                                     return;
                                 }
-
-                                // create a new, empty document
-                                final Document doc = new Document();
 
                                 // id
                                 doc.add(new TextField(INDEX_FIELD_ID, page.getID().trim(), Field.Store.YES));

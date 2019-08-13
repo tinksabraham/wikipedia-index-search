@@ -13,7 +13,6 @@ public class WikiXMLParserFactory {
         return new WikiXMLSAXParser(new File(fileName).toURI().toURL(), languageCode);
     }
 
-
     public static WikiXMLParser getSAXParser(URL fileName) {
         return new WikiXMLSAXParser(fileName);
     }
