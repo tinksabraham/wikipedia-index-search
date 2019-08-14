@@ -97,5 +97,11 @@ response.
 
 **Note** FE also handles cases when BE throws IOException. Please see the screenshots.
 
+### GUI Screenshots
+
+#### Success Search
+
+![SuccessSearch](https://user-images.githubusercontent.com/7116963/63022286-d8a23800-bea2-11e9-8d11-eacbdaaab706.png)
+
 
    
