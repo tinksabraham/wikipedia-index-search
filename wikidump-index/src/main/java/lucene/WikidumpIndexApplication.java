@@ -45,9 +45,11 @@ public class WikidumpIndexApplication {
     private static final String INDEX_FIELD_TITLE = "title";
     private static final String INDEX_FIELD_CONTRIBUTOR = "contributor";
     private static final String INDEX_FIELD_TEXT = "text";
+    private static final String INDEXED_DIR_NAME = "indexedDir";
 
     public static void main(String[] args) {
 
+        // command line arguments for wikidump file and max count
         CommandLineParser parser = new DefaultParser();
         Options options = prepareOptions();
         try {
@@ -61,12 +63,19 @@ public class WikidumpIndexApplication {
         } catch (ParseException ex) {
             logger.warn(ex.getMessage());
             new HelpFormatter().printHelp(HELP, options);
+            System.exit(0);
         }
 
         WikidumpIndexApplication main = new WikidumpIndexApplication();
         main.index();
     }
 
+    /**
+     *
+     * Create the required command line options
+     *
+     * @return Command line options
+     */
     private static Options prepareOptions() {
         Options options = new Options();
         // Required options
@@ -87,6 +96,9 @@ public class WikidumpIndexApplication {
         return options;
     }
 
+    /**
+     * Start point of indexing wiki dump file
+     */
     private void index() {
 
         // check if data directory exists
@@ -102,7 +114,7 @@ public class WikidumpIndexApplication {
         Date start = new Date();
 
         try {
-            Directory dir = FSDirectory.open(Paths.get("indexedDir"));
+            Directory dir = FSDirectory.open(Paths.get(INDEXED_DIR_NAME));
             Analyzer analyzer = new StandardAnalyzer();
             IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
             iwc.setOpenMode(OpenMode.CREATE);
@@ -126,7 +138,7 @@ public class WikidumpIndexApplication {
      *
      * @param writer               A writing handle to the index
      * @param file                 The file to be indexed
-     * @throws IOException
+     * @throws IOException         exception handling for IO
      */
     private void indexDocuments(final IndexWriter writer, File file) throws IOException {
 
@@ -167,18 +179,17 @@ public class WikidumpIndexApplication {
                             public void process(WikiPage page) {
 
                                 if (page.isRedirect())  {
-                                    logger.info("Exclude Redirection" + page.getID() + " about '"  + page.getTitle().trim() + "'");
+                                    logger.info("Exclude Redirection - " + page.getID() + " about '"  + page.getTitle().trim() + "'");
                                     return;
                                 }
 
-                                // facetid is wikipedia ID
                                 // check if docId was read successfully, stop if not
                                 if (page.getID() == null || page.getID().length() == 0) {
                                     logger.error("Facet Id unknown for wikipedia article '" + page.getTitle() + "'. Nothing done.");
                                     return;
                                 }
 
-                                // id
+                                // wikipedia id
                                 doc.add(new TextField(INDEX_FIELD_ID, page.getID().trim(), Field.Store.YES));
                                 logger.info(INDEX_FIELD_ID + " - " + page.getID().trim());
 
@@ -186,11 +197,11 @@ public class WikidumpIndexApplication {
                                 doc.add(new TextField(INDEX_FIELD_CONTRIBUTOR, page.getContributor().trim(), Field.Store.YES));
                                 logger.info(INDEX_FIELD_CONTRIBUTOR + " - " + page.getContributor().trim());
 
-                                // title
+                                // article title
                                 doc.add(new TextField(INDEX_FIELD_TITLE, page.getTitle().trim(), Field.Store.YES));
                                 logger.info(INDEX_FIELD_TITLE + " - " + page.getTitle().trim());
 
-                                // text
+                                // article body text after parsing special characters
                                 doc.add(new TextField(INDEX_FIELD_TEXT, page.getText().trim(), Field.Store.YES));
 
                                 // write document to index
@@ -203,8 +214,10 @@ public class WikidumpIndexApplication {
                                     doc.removeField(INDEX_FIELD_TEXT);
                                     WikidumpIndexApplication.counter++;
 
-                                    // just build a small index with 5000 concepts first!!! Remove later !!!
+                                    // commit and close the writer once the counter max has reached
+                                    // TODO: Check whether to run without max count on server
                                     if (WikidumpIndexApplication.counter == maxIndexCount) {
+                                        logger.debug("Last Wiki Article added to index is [ "  + page.getTitle().trim() + "  ]");
                                         writer.commit();
                                         writer.close();
                                         System.exit(0);
@@ -226,8 +239,6 @@ public class WikidumpIndexApplication {
                 }
             }
         }
-
-        return;
     }
 
 }
