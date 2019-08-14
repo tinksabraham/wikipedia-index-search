@@ -12,7 +12,8 @@ import {
   MatButtonModule,
   MatTableModule,
   MatDividerModule,
-  MatProgressSpinnerModule, MatSelectModule
+  MatProgressSpinnerModule,
+  MatSelectModule
 } from '@angular/material';
 import { ToastrModule } from 'ngx-toastr';
 
@@ -40,7 +41,7 @@ import { WikiSearchService } from './wiki-search.service';
     MatProgressSpinnerModule,
     MatSelectModule,
     ToastrModule.forRoot({
-      timeOut: 10000,
+      timeOut: 70000,
       positionClass: 'toast-top-center',
       closeButton: true,
     })
