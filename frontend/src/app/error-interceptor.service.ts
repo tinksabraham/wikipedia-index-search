@@ -23,6 +23,9 @@ export class ErrorInterceptor implements HttpInterceptor {
         case 500:
           this.toastError(response.error['error'], 'IO Error');
           break;
+        case 504:
+          this.toastError('Server may not be started', 'Server not up');
+          break;
 
         // default case for other status type
         default:

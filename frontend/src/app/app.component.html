@@ -3,12 +3,10 @@
       <button mat-button>{{title}}</button>
     </span>
     <div fxLayout="row" style="margin-left:25px; ">
-        <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
-          <div class="input-group">
-            <input class="input-group-field" type="search" value="" placeholder="Search" formControlName="search" style="border: 1px;">
-            <div class="input-group-button"><button mat-flat-button color="accent"><mat-icon>search</mat-icon></button></div>
-          </div>
-        </form>
+      <div class="input-group">
+        <input class="input-group-field" [(ngModel)]="search" type="search" value="" placeholder="Search term" style="border: 1px;">
+        <div class="input-group-button"><button mat-flat-button color="accent" (click)="onSearch()"><mat-icon>search</mat-icon></button></div>
+      </div>
     </div>
   <mat-form-field style="margin-left:25px;">
     <mat-label>Select results count</mat-label>
@@ -20,7 +18,10 @@
   </mat-form-field>
 </mat-toolbar>
 <h1 class="h1">Search Results</h1>
-<div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center" class="products">
+<ng-container *ngIf="!isLoaded">
+  <mat-spinner style="margin: 0 auto"></mat-spinner>
+</ng-container>
+<div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center" class="products" *ngIf="isLoaded">
   <table mat-table fxFlex="100%" fxFlex.gt-sm="66%" [dataSource]="wikiSearchList" class="mat-elevation-z1">
     <ng-container matColumnDef="Wikipedia Id">
       <th mat-header-cell *matHeaderCellDef >Wikipedia Id</th>

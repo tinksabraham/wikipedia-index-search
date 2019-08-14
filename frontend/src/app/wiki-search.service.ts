@@ -10,9 +10,8 @@ export class WikiSearchService {
   constructor(private http: HttpClient) { }
 
   getWikiArticles(searchTerm: string, searchSize: string): Observable<WikiSearchModel[]> {
-    this.searchUrl = this.searchUrl.replace('${searchTerm}', searchTerm);
-    this.searchUrl = this.searchUrl.replace('${searchSize}', searchSize);
-    return this.http.get<WikiSearchModel[]>(this.searchUrl);
+    return this.http.get<WikiSearchModel[]>(this.searchUrl.replace('${searchTerm}', searchTerm)
+      .replace('${searchSize}', searchSize));
   }
 
 }
