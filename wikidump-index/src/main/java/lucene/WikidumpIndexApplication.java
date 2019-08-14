@@ -15,7 +15,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Date;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -36,11 +35,11 @@ public class WikidumpIndexApplication {
     private static final Logger logger = LogManager.getLogger(WikidumpIndexApplication.class);
     private static String wikiDumpFilePath = null;
     // default
-    private static int maxIndexCount = 100;
+    private static int maxCommitIndexCount = 100;
     private static int counter = 0;
 
     private static final String WIKI_PATH = "wikiDumpFilePath";
-    private static final String MAX_INDEX = "maxIndexCount";
+    private static final String MAX_INDEX = "maxCommitIndexCount";
     private static final String HELP = "CLI Help";
     private static final String INDEX_FIELD_ID = "id";
     private static final String INDEX_FIELD_TITLE = "title";
@@ -59,7 +58,7 @@ public class WikidumpIndexApplication {
                 wikiDumpFilePath = cmd.getOptionValue(WIKI_PATH);
             }
             if(cmd.hasOption(MAX_INDEX)) {
-                maxIndexCount = Integer.parseInt(cmd.getOptionValue(MAX_INDEX));
+                maxCommitIndexCount = Integer.parseInt(cmd.getOptionValue(MAX_INDEX));
             }
         } catch (ParseException ex) {
             logger.error(ex.getMessage());
@@ -87,7 +86,7 @@ public class WikidumpIndexApplication {
                 .build();
         Option maxOption = Option.builder().required()
                 .longOpt(MAX_INDEX)
-                .desc("maximum number of indexed file" )
+                .desc("maximum number of indexed file to be committed" )
                 .hasArg()
                 .build();
 
@@ -109,24 +108,16 @@ public class WikidumpIndexApplication {
             System.exit(1);
         }
 
-        // to calculate indexing time as a performance measure
-        Date start = new Date();
-
         try {
             Directory dir = FSDirectory.open(Paths.get(INDEXED_DIR_NAME));
             Analyzer analyzer = new StandardAnalyzer();
             IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
+
+            // create index every time newly - update is not included
             iwc.setOpenMode(OpenMode.CREATE);
 
-            // index
             IndexWriter writer = new IndexWriter(dir, iwc);
             indexDocuments(writer, wikipediaDumpFile);
-            writer.close();
-
-            // time stamping
-            Date end = new Date();
-            logger.debug("Indexing time: " + (end.getTime() - start.getTime()) + " total milliseconds for " + WikidumpIndexApplication.counter + " articles.");
-
         } catch (IOException e) {
             logger.error("Exception: " + e.getMessage());
         }
@@ -184,6 +175,9 @@ public class WikidumpIndexApplication {
 
                 try {
 
+                    // add wait and notify until all documents are indexed
+                    // final Object semaphore = new Object();
+
                     final Document doc = new Document();
                     WikiXMLParser wxsp = WikiXMLParserFactory.getSAXParser(file.getAbsolutePath());
 
@@ -227,20 +221,26 @@ public class WikidumpIndexApplication {
                                     doc.removeField(INDEX_FIELD_TEXT);
                                     WikidumpIndexApplication.counter++;
 
-                                    // commit and close the writer once the counter max has reached
-                                    // TODO: Check whether to run without max count on server
-                                    if (WikidumpIndexApplication.counter == maxIndexCount) {
-                                        logger.debug("Last Wiki Article added to index is [ "  + page.getTitle().trim() + "  ]");
+                                    // commit for every consecutive max count for better memory usage
+                                    if (WikidumpIndexApplication.counter % maxCommitIndexCount == 0) {
+                                        logger.debug("Commit max index count");
                                         writer.commit();
-                                        writer.close();
-                                        System.exit(0);
                                     }
 
-                                } catch (Exception e) {
+                                } catch (IOException e) {
                                     logger.error("Exception while writing index: " + e.getMessage());
                                 }
                             }
 
+                            public void complete() {
+                                try {
+                                    logger.info("------------------Finished Indexing-----------------");
+                                    writer.close();
+                                } catch (IOException e) {
+                                    logger.error("Exception while closing index writer: " + e.getMessage());
+                                }
+                                System.exit(0);
+                            }
                         });
                         wxsp.parse();
                     } catch (Exception e) {
