@@ -106,5 +106,8 @@ response.
 #### 2.Parse Error with starting wildcard
 ![ParseError](https://user-images.githubusercontent.com/7116963/63022460-4484a080-bea3-11e9-8984-9fa3e854a8a4.png)
 
+#### 3.Index Dir not found error when starting backend
+![IndexIOError](https://user-images.githubusercontent.com/7116963/63023032-764a3700-bea4-11e9-8972-d823933b854a.png)
+
 
    
