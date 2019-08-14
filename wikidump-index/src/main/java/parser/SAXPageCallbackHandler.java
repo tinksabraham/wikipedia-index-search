@@ -11,6 +11,7 @@ public class SAXPageCallbackHandler extends DefaultHandler {
 	private static final String XM_ELEMENT_ID = "id";
 	private static final String XM_ELEMENT_TEXT = "text";
 	private static final String XM_ELEMENT_USERNAME = "username";
+	private static final String XM_ELEMENT_MEDIAWIKI = "mediawiki";
 
 	private boolean insideRevision = false;
 	private PageCallbackHandler pageHandler;
@@ -49,13 +50,15 @@ public class SAXPageCallbackHandler extends DefaultHandler {
 	public void endElement(String uri, String name, String qName){
 		if (qName.equals(XM_ELEMENT_REVISION)){
 			insideRevision = false;
-		}
-		if (qName.equals(XM_ELEMENT_PAGE)){
+		} else if (qName.equals(XM_ELEMENT_PAGE)){
 			currentPage.setTitle(currentTitle.toString());
 			currentPage.setID(currentID.toString());
 			currentPage.setWikiText(currentWikitext.toString(), language);
 			currentPage.setContributor(currentContributor.toString());
 			pageHandler.process(currentPage);
+		} else if (qName.equals(XM_ELEMENT_MEDIAWIKI)) {
+			// notify semaphore to further execute
+			pageHandler.complete();
 		}
 	}
 

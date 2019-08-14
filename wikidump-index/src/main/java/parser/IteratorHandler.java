@@ -12,4 +12,6 @@ public class IteratorHandler implements PageCallbackHandler {
 		parser.notifyPage(page);
 	}
 
+	public void complete() { }
+
 }

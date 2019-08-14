@@ -17,29 +17,32 @@ Make sure that you have downloaded the wikidump file before you have execute the
 Navigate to dist/ directory in a terminal and run 
 ```
 java -jar wikipedia-lucene-1.0-SNAPSHOT.jar
-    --maxIndexCount [Max count of wikidump parsing to be indexed by lucene] 
+    --maxCommitIndexCount [Max number of indexed files to be committed during full indexing] 
     --wikiDumpFilePath [Absolute path to wiki dump file]
 
 e.g.
 -> Usage 1 (.bz2 file)
 java -jar wikipedia-lucene-1.0-SNAPSHOT.jar 
-    --maxIndexCount 1000
+    --maxCommitIndexCount 100
     --wikiDumpFilePath D:\UserData\temp\projects\Wikidump-search\pages\enwiki-latest-pages-articles.xml.bz2
 
 -> Usage 2 (xml file)
 java -jar wikipedia-lucene-1.0-SNAPSHOT.jar 
-    --maxIndexCount 1000 
+    --maxCommitIndexCount 100 
     --wikiDumpFilePath D:\UserData\temp\projects\Wikidump-search\pages\enwiki-latest-pages-articles.xml
     
 ```
 
+**Note** Here for better memory usage, indexed files are committed after every *maxCommitIndexCount*. Also when system
+crasher or anything happen some parsed xml are indexed and committed and can also be searched.
+
 **Note** Here the indexed directory will be generated and named as *indexedDir*. 
 
-**Note** Also please delete this *indexedDir* before re-running once it already created.
+**Note** Also please delete *indexedDir* before re-running again when files are indexed at least once.
 In fact it will throw an error in the log for user to know. 
 
 ### Possible troubleshooting
-When executing the run, it will generate a log file *lucene.log*. Look for possible **error** which points to issues.
+When executing the run, it will generate a log file *lucene.log*. Look for possible **error** which can pin-point to an issue.
 Also you will see logs (info, warn, error) in the terminal as well. 
 Currently it will output some info logs to see *id*, *contributor*, *title* during indexing.
 

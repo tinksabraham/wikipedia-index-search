@@ -1,17 +1,32 @@
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { TestBed, async } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
+import { MatTableModule } from '@angular/material';
+import { of } from 'rxjs';
 import { AppComponent } from './app.component';
+import { WikiSearchModel } from './wiki-search.model';
+import { WikiSearchService } from './wiki-search.service';
 
 describe('AppComponent', () => {
   beforeEach(async(() => {
+    const wikiSearchServiceStub = {
+      getWikiArticles: () => ({
+        subscribe: () => ({})
+      })
+    };
+
     TestBed.configureTestingModule({
       imports: [
-        RouterTestingModule
+        MatTableModule
       ],
+      schemas: [NO_ERRORS_SCHEMA],
       declarations: [
         AppComponent
       ],
+      providers: [
+        { provide: WikiSearchService, useValue: wikiSearchServiceStub }
+      ]
     }).compileComponents();
+
   }));
 
   it('should create the app', () => {
@@ -30,6 +45,26 @@ describe('AppComponent', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector('h1').textContent).toContain('AID Wikipedia Search');
+    expect(compiled.querySelector('h1').textContent).toContain('Search Results');
+  });
+
+  it('should get exactly one result', () => {
+
+    const wikiSearchModelList = [];
+    const wikiSearchModel: WikiSearchModel = {
+      id: '45',
+      contributor: 'Frank',
+      title: 'Frankenstein'
+    };
+
+    wikiSearchModelList.push(wikiSearchModel);
+
+    const fixture = TestBed.createComponent(AppComponent);
+    const comp = fixture.componentInstance;
+    const wikiSearchStub: WikiSearchService = fixture.debugElement.injector.get(WikiSearchService);
+    spyOn(wikiSearchStub, 'getWikiArticles').and.returnValue(of(wikiSearchModelList));
+    fixture.detectChanges();
+
+    expect(comp.wikiSearchList).toBeDefined();
   });
 });

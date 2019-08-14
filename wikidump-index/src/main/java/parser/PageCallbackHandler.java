@@ -21,6 +21,12 @@ public interface PageCallbackHandler {
 	 * @param page a wikipedia page object
 	 * @see   WikiPage
 	 */
-	public void process(WikiPage page);
+	void process(WikiPage page);
+
+
+	/**
+	 * This is for handling complete parse file
+	 */
+	void complete();
 
 }
