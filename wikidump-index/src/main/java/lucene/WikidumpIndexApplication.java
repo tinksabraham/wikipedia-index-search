@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Date;
 
@@ -63,7 +64,7 @@ public class WikidumpIndexApplication {
         } catch (ParseException ex) {
             logger.warn(ex.getMessage());
             new HelpFormatter().printHelp(HELP, options);
-            System.exit(0);
+            System.exit(1);
         }
 
         WikidumpIndexApplication main = new WikidumpIndexApplication();
@@ -101,12 +102,10 @@ public class WikidumpIndexApplication {
      */
     private void index() {
 
-        // check if data directory exists
-        logger.debug("wikipedia dump file = " + wikiDumpFilePath);
-        final File wikipediaDumpFile = new File(wikiDumpFilePath);
-        if (!wikipediaDumpFile.exists() || !wikipediaDumpFile.canRead()) {
-            logger.error("Wikipedia dump file '" + wikipediaDumpFile.getAbsolutePath()
-                    + "' does not exist or is not readable, please check the path. ");
+        File wikipediaDumpFile = checkWikidumpFileExits();
+
+        if (Files.exists(Paths.get(INDEXED_DIR_NAME))) {
+            logger.error("Indexed Directory already exist, please delete it and re-run'");
             System.exit(1);
         }
 
@@ -131,6 +130,20 @@ public class WikidumpIndexApplication {
         } catch (IOException e) {
             logger.error("Exception: " + e.getMessage());
         }
+    }
+
+    /**
+     * check if data directory exists
+     */
+    private File checkWikidumpFileExits() {
+        logger.debug("wikipedia dump file = " + wikiDumpFilePath);
+        final File wikipediaDumpFile = new File(wikiDumpFilePath);
+        if (!wikipediaDumpFile.exists() || !wikipediaDumpFile.canRead()) {
+            logger.error("Wikipedia dump file '" + wikipediaDumpFile.getAbsolutePath()
+                    + "' does not exist or is not readable, please check the path. ");
+            System.exit(1);
+        }
+        return wikipediaDumpFile;
     }
 
     /**
