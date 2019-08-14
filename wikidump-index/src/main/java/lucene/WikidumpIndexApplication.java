@@ -62,7 +62,7 @@ public class WikidumpIndexApplication {
                 maxIndexCount = Integer.parseInt(cmd.getOptionValue(MAX_INDEX));
             }
         } catch (ParseException ex) {
-            logger.warn(ex.getMessage());
+            logger.error(ex.getMessage());
             new HelpFormatter().printHelp(HELP, options);
             System.exit(1);
         }
