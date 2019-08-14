@@ -99,9 +99,12 @@ response.
 
 ### GUI Screenshots
 
-#### Success Search
+#### 1.Success Search
 
 ![SuccessSearch](https://user-images.githubusercontent.com/7116963/63022286-d8a23800-bea2-11e9-8d11-eacbdaaab706.png)
+
+#### 2.Parse Error with starting wildcard
+![ParseError](https://user-images.githubusercontent.com/7116963/63022460-4484a080-bea3-11e9-8984-9fa3e854a8a4.png)
 
 
    
