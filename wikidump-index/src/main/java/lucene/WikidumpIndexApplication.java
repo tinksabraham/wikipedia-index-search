@@ -109,6 +109,7 @@ public class WikidumpIndexApplication {
         }
 
         try {
+            //this directory will contain the indexes
             Directory dir = FSDirectory.open(Paths.get(INDEXED_DIR_NAME));
             Analyzer analyzer = new StandardAnalyzer();
             IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
@@ -116,6 +117,7 @@ public class WikidumpIndexApplication {
             // create index every time newly - update is not included
             iwc.setOpenMode(OpenMode.CREATE);
 
+            //create the indexer
             IndexWriter writer = new IndexWriter(dir, iwc);
             indexDocuments(writer, wikipediaDumpFile);
         } catch (IOException e) {
