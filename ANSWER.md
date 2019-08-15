@@ -13,8 +13,7 @@ inverse document frequency (idf). We can also improve the ranked results by impl
 on our criteria either at index time or query time. With my test results, standard boost algorithm returns the search query very fast.
 
 ## c) How would your solution change if it needed to be run within 1GB of memory? If it runs off of disk, describe what/how many disk operations are needed to perform a query.
-Usage of FSDirectory instead of RAMDirectory when there is available memory limits. 
-TODO- Investigate on RAMDirectory vs FSDirectory - Check docs on disk IO ops
+Usage of FSDirectory instead of RAMDirectory when there is memory limits.
 
 ## e) What parts of the indexing/lookup did you implement yourself?
 

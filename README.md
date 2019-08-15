@@ -22,7 +22,7 @@ and search for a contributor name or a word.
 
 ## System Requirement & Installation
 * Java 8 or more
-* Nodejs - preferably version 10.16.2 and npm (node package manager)
+* Nodejs - preferably version 10.16.2 & npm (node package manager) & Angular CLI
 * Maven build tool
 
 # First Tool- Creating lucene index on wiki dump file
@@ -96,10 +96,13 @@ Make sure you have nodejs and npm installed on the machine.
 Navigate to frontend/ directory in a terminal and run. 
 
 ```
+npm install -g @angular/cli@7.3.9
+
 npm install -dd
 
 npm run startwithbackend
 ```
+**Note** Angular cli is installed globally. 
 
 **Note** npm install with *-dd* option shows status in the terminal. 
 
