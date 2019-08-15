@@ -6,7 +6,7 @@
     + [Possible troubleshooting](#possible-troubleshooting)
 - [Second Tool- GUI for searching index](#second-tool--gui-for-searching-index)
   * [Backend](#backend)
-  * [frontend](#frontend)
+  * [Frontend](#frontend)
     + [GUI Usage](#gui-usage)
     + [GUI Screenshots](#gui-screenshots)
       - [1.Success Search](#1success-search)
@@ -32,18 +32,18 @@ Make sure that you have downloaded the wikidump file before you have execute the
 
 Navigate to dist/ directory in a terminal and run 
 ```
-java -jar wikipedia-lucene-1.0-SNAPSHOT.jar
+java -jar wikipedia-index-1.0-SNAPSHOT.jar
     --maxCommitIndexCount [Max number of indexed files to be committed during full indexing] 
     --wikiDumpFilePath [Absolute path to wiki dump file]
 
 e.g.
 -> Usage 1 (.bz2 file)
-java -jar wikipedia-lucene-1.0-SNAPSHOT.jar 
+java -jar wikipedia-index-1.0-SNAPSHOT.jar 
     --maxCommitIndexCount 100
     --wikiDumpFilePath D:\UserData\temp\projects\Wikidump-search\pages\enwiki-latest-pages-articles.xml.bz2
 
 -> Usage 2 (xml file)
-java -jar wikipedia-lucene-1.0-SNAPSHOT.jar 
+java -jar wikipedia-index-1.0-SNAPSHOT.jar
     --maxCommitIndexCount 100 
     --wikiDumpFilePath D:\UserData\temp\projects\Wikidump-search\pages\enwiki-latest-pages-articles.xml
     
