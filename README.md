@@ -1,3 +1,19 @@
+# Table of Contents
+- [Wikipedia Dump Index and GUI for searching](#wikipedia-dump-index-and-gui-for-searching)
+  * [System Requirement & Installation](#system-requirement---installation)
+- [First Tool- Creating lucene index on wiki dump file](#first-tool--creating-lucene-index-on-wiki-dump-file)
+  * [Usage](#usage)
+    + [Possible troubleshooting](#possible-troubleshooting)
+- [Second Tool- GUI for searching index](#second-tool--gui-for-searching-index)
+  * [Backend](#backend)
+  * [frontend](#frontend)
+    + [GUI Usage](#gui-usage)
+    + [GUI Screenshots](#gui-screenshots)
+      - [1.Success Search](#1success-search)
+      - [2.Parse Error with starting wildcard](#2parse-error-with-starting-wildcard)
+      - [3.Index Dir not found error when starting backend](#3index-dir-not-found-error-when-starting-backend)
+      - [4. Server not running error when BE not starting and FE is used](#4-server-not-running-error-when-be-not-starting-and-fe-is-used)
+
 # Wikipedia Dump Index and GUI for searching
 Repo for indexing wikidump and able to search index via GUI. Basically it provides functionality indexing wiki dump file
 and search for a contributor name or a word. 
@@ -73,7 +89,7 @@ It was added only to make sure search is working during development.
 Also when you pass a wrong directory and when GUI makes a search, BE will responds with custom IO exception and FE will
 show a toaster. Please check the screenshots.
 
-## frontend
+## Frontend
 Frontend is built with Angular framework (version 7)
 
 Make sure you have nodejs and npm installed on the machine. 
