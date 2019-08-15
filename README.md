@@ -112,5 +112,8 @@ response.
 #### 3.Index Dir not found error when starting backend
 ![IndexIOError](https://user-images.githubusercontent.com/7116963/63023032-764a3700-bea4-11e9-8972-d823933b854a.png)
 
+#### 4. Server not running error when BE not starting and FE is used
+![ServerNotRunningError](https://user-images.githubusercontent.com/7116963/63093408-4e6ed800-bf65-11e9-9c41-59931a7870b4.png)
+
 
    
